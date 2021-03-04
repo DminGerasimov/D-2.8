@@ -1,10 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import user
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Author(models.Model):
     # Поле встроенного пользователя User from django.contrib.auth.models
-    user = models.OneToOneField(User, on_delete = models.CASCADE)
+    user_author = models.OneToOneField(User, on_delete = models.CASCADE)
 
     # Поле рейтинга автора
     rating = models.FloatField(default = 0)
@@ -31,26 +31,28 @@ class Post(models.Model):
     # Заголовок статьи/новости
     chapter = models.CharField(max_length = 200, unique = False)
     # Текст статьи/новости
-    # chapter = models.TextField(max_length = 200, unique = False)
+    chapter = models.TextField()
     # Рейтинг статьи/новости
-
+    article_news_rate = models.FloatField(default=0.0)
     # Связь «многие ко многим» с моделью Category (с дополнительной моделью PostCategory)
-
+    category = models.ManyToManyField(Category, through= 'PostCategory')
 
 class PostCategory(models.Model):
     # Связь «один ко многим» с моделью Post
-
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
     # Связь «один ко многим» с моделью Category
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
 
 class Comment(models.Model):
     # Связь «один ко многим» с моделью Post
-
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
     # Связь «один ко многим» с встроенной моделью User /
     # (комментарии может оставить любой пользователь, не обязательно автор)
-
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     # Текст комментария
-
+    comment_text = models.TextField(help_text='Текст комментария', default='')
     # Дата и время создания комментария
-
+    time_creation = models.DateTimeField(auto_now_add=True)
     # Рейтинг комментария
+    comment_rate = models.FloatField(default=0.0)
