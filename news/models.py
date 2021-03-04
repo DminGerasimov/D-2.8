@@ -4,11 +4,34 @@ from django.contrib.auth.models import User
 # Create your models here.
 class Author(models.Model):
     # Поле встроенного пользователя User from django.contrib.auth.models
-    user_author = models.OneToOneField(User, on_delete = models.CASCADE)
+    user = models.OneToOneField(User, on_delete = models.CASCADE)
 
     # Поле рейтинга автора
-    rating = models.FloatField(default = 0)
+    rating = models.IntegerField(default = 0)
 
+
+    #     Метод update_rating() модели Author, который обновляет рейтинг пользователя, переданный в аргумент этого метода.
+    # Он состоит из следующего:
+    #     суммарный рейтинг каждой статьи автора умножается на 3;
+    #     суммарный рейтинг всех комментариев автора;
+    #     суммарный рейтинг всех комментариев к статьям автора
+    def update_rating(user_author):
+        sum_article_rate, sum_author_commemts_rate, sum_commemts_rate = 0, 0, 0
+        # Статьи автора:
+        
+        for _ in Post.objects.filter(author = user_author).values('article_news_rate'):
+            sum_article_rate += int(_.get('article_news_rate',0))
+
+        # Комментарии автора
+        for _ in Comment.objects.filter(user = user_author).values('comment_rate'):
+            sum_author_commemts_rate += int(_.get('comment_rate',0))
+
+        # Комментарии к статьям автора
+        for _ in Comment.objects.filter(user = user_author).values('comment_rate'):
+            sum_author_commemts_rate += int(_.get('comment_rate',0))
+
+        self.rating = sum_article_rate*3 + sum_author_commemts_rate + sum_commemts_rate
+        self.rating.save()
 
 class Category(models.Model):
     # Категория новостей, статей - уникальная
@@ -31,11 +54,26 @@ class Post(models.Model):
     # Заголовок статьи/новости
     chapter = models.CharField(max_length = 200, unique = False)
     # Текст статьи/новости
-    chapter = models.TextField()
+    text = models.TextField(default = '')
     # Рейтинг статьи/новости
-    article_news_rate = models.FloatField(default=0.0)
+    article_news_rate = models.IntegerField(default=0.0)
     # Связь «многие ко многим» с моделью Category (с дополнительной моделью PostCategory)
     category = models.ManyToManyField(Category, through= 'PostCategory')
+
+    # Методы like() и dislike(), которые увеличивают/уменьшают рейтинг на единицу
+    def like():
+        self.article_news_rate += 1
+        self.save
+
+    def dislike():
+        self.article_news_rate -= 1
+        self.save
+
+    # Метод preview() модели Post, который возвращает начало статьи 
+    # (предварительный просмотр) длиной 124 символа и добавляет многоточие в конце
+    def preview():
+        return self.text[0:123].join('...')
+
 
 class PostCategory(models.Model):
     # Связь «один ко многим» с моделью Post
@@ -55,4 +93,13 @@ class Comment(models.Model):
     # Дата и время создания комментария
     time_creation = models.DateTimeField(auto_now_add=True)
     # Рейтинг комментария
-    comment_rate = models.FloatField(default=0.0)
+    comment_rate = models.IntegerField(default=0.0)
+
+    # Методы like() и dislike(), которые увеличивают/уменьшают рейтинг на единицу
+    def like():
+        self.comment_rate += 1
+        self.save
+
+    def dislike():
+        self.comment_rate -= 1
+        self.save
