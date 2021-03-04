@@ -29,9 +29,9 @@ class Post(models.Model):
     time_in = models.DateTimeField(auto_now_add = True)
 
     # Заголовок статьи/новости
-
+    chapter = models.CharField(max_length = 200, unique = False)
     # Текст статьи/новости
-
+    # chapter = models.TextField(max_length = 200, unique = False)
     # Рейтинг статьи/новости
 
     # Связь «многие ко многим» с моделью Category (с дополнительной моделью PostCategory)
