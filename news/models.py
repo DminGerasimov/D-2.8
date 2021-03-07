@@ -1,11 +1,11 @@
 from django.db import models
-from django.contrib.auth.models import User
+import django.contrib.auth.models
 
 # Create your models here.
 class Author(models.Model):
     # Поле встроенного пользователя User from django.contrib.auth.models
-    user = models.OneToOneField(User, on_delete = models.CASCADE)
-
+    user = models.OneToOneField(django.contrib.auth.models.User, on_delete = models.CASCADE)
+    user_name = models.CharField(max_length = 30, default = '')
     # Поле рейтинга автора
     rating = models.IntegerField(default = 0)
 
@@ -46,7 +46,7 @@ class Post(models.Model):
     # Выбор вида публикации: статья, новость фиксированная двумя значениями
     news, article = 'NE', 'AR'
     POSITIONS = [(news, 'Новость'), (article,'Статья')]
-    type_news_article = models.CharField(max_length = 2, choices = POSITIONS, default = news)
+    type_news_article = models.CharField(max_length = 2, choices = POSITIONS, default = 'news')
 
     # Дата создания публикации
     time_in = models.DateTimeField(auto_now_add = True)
@@ -87,7 +87,7 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     # Связь «один ко многим» с встроенной моделью User /
     # (комментарии может оставить любой пользователь, не обязательно автор)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(Author, on_delete=models.CASCADE)
     # Текст комментария
     comment_text = models.TextField(help_text='Текст комментария', default='')
     # Дата и время создания комментария
