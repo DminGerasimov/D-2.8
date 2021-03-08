@@ -1,11 +1,11 @@
 from django.db import models
-import django.contrib.auth.models
+from django.conf import global_settings
 
 # Create your models here.
 class Author(models.Model):
     # Поле встроенного пользователя User from django.contrib.auth.models
-    user = models.OneToOneField(django.contrib.auth.models.User, on_delete = models.CASCADE)
-    user_name = models.CharField(max_length = 30, default = '')
+    user = models.OneToOneField(global_settings.AUTH_USER_MODEL, on_delete = models.CASCADE)
+    
     # Поле рейтинга автора
     rating = models.IntegerField(default = 0)
 
@@ -56,7 +56,7 @@ class Post(models.Model):
     # Текст статьи/новости
     text = models.TextField(default = '')
     # Рейтинг статьи/новости
-    article_news_rate = models.IntegerField(default=0.0)
+    article_news_rate = models.IntegerField(default=0)
     # Связь «многие ко многим» с моделью Category (с дополнительной моделью PostCategory)
     category = models.ManyToManyField(Category, through= 'PostCategory')
 
