@@ -15,23 +15,27 @@ class Author(models.Model):
     #     суммарный рейтинг каждой статьи автора умножается на 3;
     #     суммарный рейтинг всех комментариев автора;
     #     суммарный рейтинг всех комментариев к статьям автора
-    def update_rating(user_author):
+    def update_rating(self):
         sum_article_rate, sum_author_commemts_rate, sum_commemts_rate = 0, 0, 0
-        # Статьи автора:
         
-        for _ in Post.objects.filter(author = user_author).values('article_news_rate'):
-            sum_article_rate += int(_.get('article_news_rate',0))
-
+        # Статьи автора:
+        for _ in Post.objects.filter(author = self.id).values('article_news_rate'):
+            sum_article_rate += int(_['article_news_rate'])
+        print(sum_article_rate)
+        
         # Комментарии автора
-        for _ in Comment.objects.filter(user = user_author).values('comment_rate'):
-            sum_author_commemts_rate += int(_.get('comment_rate',0))
-
+        for _ in Comment.objects.filter(user = self.id).values('comment_rate'):
+            sum_author_commemts_rate += int(_['comment_rate'])
+        print(sum_author_commemts_rate)
+        print(f'self.id {self.id}')
         # Комментарии к статьям автора
-        for _ in Comment.objects.filter(user = user_author).values('comment_rate'):
-            sum_author_commemts_rate += int(_.get('comment_rate',0))
-
+        for _ in Comment.objects.filter(post__author = self.id ).values('comment_rate'):
+            sum_commemts_rate += int(_['comment_rate'])
+        print(sum_commemts_rate)
+        
         self.rating = sum_article_rate*3 + sum_author_commemts_rate + sum_commemts_rate
-        self.rating.save()
+        print(self.rating)
+        self.save()
 
 class Category(models.Model):
     # Категория новостей, статей - уникальная
@@ -59,14 +63,19 @@ class Post(models.Model):
     article_news_rate = models.IntegerField(default=0)
     # Связь «многие ко многим» с моделью Category (с дополнительной моделью PostCategory)
     category = models.ManyToManyField(Category, through= 'PostCategory')
+    # количество (диз)лайков статьи/новости
+    likes = models.IntegerField(default=0)
+    dislikes = models.IntegerField(default=0)
 
     # Методы like() и dislike(), которые увеличивают/уменьшают рейтинг на единицу
-    def like():
+    def like(self):
         self.article_news_rate += 1
+        self.likes += 1
         self.save
 
-    def dislike():
+    def dislike(self):
         self.article_news_rate -= 1
+        self.dislikes -=1
         self.save
 
     # Метод preview() модели Post, который возвращает начало статьи 
@@ -93,13 +102,13 @@ class Comment(models.Model):
     # Дата и время создания комментария
     time_creation = models.DateTimeField(auto_now_add=True)
     # Рейтинг комментария
-    comment_rate = models.IntegerField(default=0.0)
+    comment_rate = models.IntegerField(default=0)
 
     # Методы like() и dislike(), которые увеличивают/уменьшают рейтинг на единицу
-    def like():
+    def like(self):
         self.comment_rate += 1
         self.save
 
-    def dislike():
+    def dislike(self):
         self.comment_rate -= 1
         self.save

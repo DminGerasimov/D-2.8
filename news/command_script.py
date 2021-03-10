@@ -32,9 +32,66 @@ p2.category.all().values()
 p3.category.all().values()
 
 # 6. Создать как минимум 4 комментария к разным объектам модели Post (в каждом объекте должен быть как минимум один комментарий).
+c1 = Comment.objects.create(post = p1, user = a1, comment_text ='1 Комментарий к посту 1 пользователя 1')
+c2 = Comment.objects.create(post = p1, user = a1, comment_text ='2 Комментарий к посту 1 пользователя 1')
+c3 = Comment.objects.create(post = p2, user = a2, comment_text ='Комментарий к посту 2 пользователя 2')
+c4 = Comment.objects.create(post = p3, user = a2, comment_text ='Комментарий к посту 3 пользователя 2')
+c5 = Comment.objects.create(post = p3, user = a1, comment_text ='Комментарий к посту 3 пользователя 1')
 
 # 7. Применяя функции like() и dislike() к статьям/новостям и комментариям, скорректировать рейтинги этих объектов.
+Comment.objects.all().values('id') #определяем id комментариев
+_ = Comment.objects.get(id=1)
+_.like()
+_.like()
+_.like()
+_.save()
+_ = Comment.objects.get(id=2)
+_.like()
+_.dislike()
+_.dislike()
+_.save()
+_ = Comment.objects.get(id=3)
+_.dislike()
+_.dislike()
+_.dislike()
+_.save()
+_ = Comment.objects.get(id=4)
+_.like()
+_.like()
+_.dislike()
+_.save()
+
+Post.objects.all().values('id') #определяем id статей\новостей
+_ = Post.objects.get(id=13)
+_.like()
+_.like()
+_.like()
+_.save()
+
+_ = Post.objects.get(id=14)
+_.like()
+_.dislike()
+_.like()
+_.save()
+
+_ = Post.objects.get(id=15)
+_.dislike()
+_.dislike()
+_.dislike()
+_.save()
+
 # 8. Обновить рейтинги пользователей.
+Author.objects.all().values('id') # определяем id авторов
+Author.objects.get(id=7).update_rating()
+Author.objects.get(id=8).update_rating()
+
 # 9. Вывести username и рейтинг лучшего пользователя (применяя сортировку и возвращая поля первого объекта).
+best = Author.objects.all().order_by('-rating').values('user_id','rating')[0]
+f"""username: {User.objects.filter(id=int(best['user_id'])).values('username')[0]['username']}"""
+f"""rating: {best['rating']}"""
+
 # 10. Вывести дату добавления, username автора, рейтинг, заголовок и превью лучшей статьи, основываясь на лайках/дислайках к этой статье.
+
+
 # 11. Вывести все комментарии (дата, пользователь, рейтинг, текст) к этой статье.
+
