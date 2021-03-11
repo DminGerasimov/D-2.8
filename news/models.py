@@ -64,8 +64,8 @@ class Post(models.Model):
     # Связь «многие ко многим» с моделью Category (с дополнительной моделью PostCategory)
     category = models.ManyToManyField(Category, through= 'PostCategory')
     # количество (диз)лайков статьи/новости
-    likes = models.IntegerField(default=0)
-    dislikes = models.IntegerField(default=0)
+    # likes = models.IntegerField(default=0)
+    # dislikes = models.IntegerField(default=0)
 
     # Методы like() и dislike(), которые увеличивают/уменьшают рейтинг на единицу
     def like(self):
@@ -81,7 +81,7 @@ class Post(models.Model):
     # Метод preview() модели Post, который возвращает начало статьи 
     # (предварительный просмотр) длиной 124 символа и добавляет многоточие в конце
     def preview():
-        return self.text[0:123].join('...')
+        return self.text[:23].join('...')
 
 
 class PostCategory(models.Model):
@@ -112,3 +112,10 @@ class Comment(models.Model):
     def dislike(self):
         self.comment_rate -= 1
         self.save
+
+# class FindBestPost:
+#     def __init__(self):
+#         id_best_post = None
+
+#     def search(self):
+        

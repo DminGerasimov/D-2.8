@@ -88,10 +88,16 @@ Author.objects.get(id=8).update_rating()
 # 9. Вывести username и рейтинг лучшего пользователя (применяя сортировку и возвращая поля первого объекта).
 best = Author.objects.all().order_by('-rating').values('user_id','rating')[0]
 f"""username: {User.objects.filter(id=int(best['user_id'])).values('username')[0]['username']}"""
-f"""rating: {best['rating']}"""
+f"""higly rating: {best['rating']}"""
 
 # 10. Вывести дату добавления, username автора, рейтинг, заголовок и превью лучшей статьи, основываясь на лайках/дислайках к этой статье.
-
-
+    # получаем словарь с полями лучшей статьи (наибольший article_news_rate)
+_ = Post.objects.all().order_by('-article_news_rate').values('author','article_news_rate', 'chapter','id', 'time_in')[0]
+    # получаем дату добавления
+best_post = Post.objects.get(id = int(_['id']))
+    # получаем user_id автора
+# u_id = Author.objects.filter().values('user_id')[0][str(best_post.)]
+    # получаем username
+User.objects.filter(id = int(u_id)).values('username')[0]['username']
 # 11. Вывести все комментарии (дата, пользователь, рейтинг, текст) к этой статье.
 
