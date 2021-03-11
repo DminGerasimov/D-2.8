@@ -21,26 +21,26 @@ class Author(models.Model):
         # Статьи автора:
         for _ in Post.objects.filter(author = self.id).values('article_news_rate'):
             sum_article_rate += int(_['article_news_rate'])
-        print(sum_article_rate)
+        # print(sum_article_rate)
         
         # Комментарии автора
         for _ in Comment.objects.filter(user = self.id).values('comment_rate'):
             sum_author_commemts_rate += int(_['comment_rate'])
-        print(sum_author_commemts_rate)
-        print(f'self.id {self.id}')
+        # print(sum_author_commemts_rate)
+
         # Комментарии к статьям автора
         for _ in Comment.objects.filter(post__author = self.id ).values('comment_rate'):
             sum_commemts_rate += int(_['comment_rate'])
-        print(sum_commemts_rate)
+        # print(sum_commemts_rate)
         
         self.rating = sum_article_rate*3 + sum_author_commemts_rate + sum_commemts_rate
-        print(self.rating)
+        # print(self.rating)
         self.save()
+
 
 class Category(models.Model):
     # Категория новостей, статей - уникальная
     news_category = models.CharField(max_length = 24, unique = True)
-   
 
 
 class Post(models.Model):
@@ -57,36 +57,35 @@ class Post(models.Model):
 
     # Заголовок статьи/новости
     chapter = models.CharField(max_length = 200, unique = False)
+
     # Текст статьи/новости
     text = models.TextField(default = '')
+
     # Рейтинг статьи/новости
     article_news_rate = models.IntegerField(default=0)
+
     # Связь «многие ко многим» с моделью Category (с дополнительной моделью PostCategory)
     category = models.ManyToManyField(Category, through= 'PostCategory')
-    # количество (диз)лайков статьи/новости
-    # likes = models.IntegerField(default=0)
-    # dislikes = models.IntegerField(default=0)
-
+    
     # Методы like() и dislike(), которые увеличивают/уменьшают рейтинг на единицу
     def like(self):
         self.article_news_rate += 1
-        self.likes += 1
         self.save
 
     def dislike(self):
         self.article_news_rate -= 1
-        self.dislikes -=1
         self.save
 
     # Метод preview() модели Post, который возвращает начало статьи 
     # (предварительный просмотр) длиной 124 символа и добавляет многоточие в конце
-    def preview():
-        return self.text[:23].join('...')
+    def preview(self):
+        return f'{self.text[0:123]}...'
 
 
 class PostCategory(models.Model):
     # Связь «один ко многим» с моделью Post
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
+
     # Связь «один ко многим» с моделью Category
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
@@ -94,13 +93,17 @@ class PostCategory(models.Model):
 class Comment(models.Model):
     # Связь «один ко многим» с моделью Post
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
+
     # Связь «один ко многим» с встроенной моделью User /
     # (комментарии может оставить любой пользователь, не обязательно автор)
     user = models.ForeignKey(Author, on_delete=models.CASCADE)
+
     # Текст комментария
     comment_text = models.TextField(help_text='Текст комментария', default='')
+
     # Дата и время создания комментария
     time_creation = models.DateTimeField(auto_now_add=True)
+
     # Рейтинг комментария
     comment_rate = models.IntegerField(default=0)
 
@@ -112,10 +115,3 @@ class Comment(models.Model):
     def dislike(self):
         self.comment_rate -= 1
         self.save
-
-# class FindBestPost:
-#     def __init__(self):
-#         id_best_post = None
-
-#     def search(self):
-        
